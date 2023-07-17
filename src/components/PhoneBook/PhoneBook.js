@@ -4,12 +4,6 @@ import css from './PhoneBook.module.css';
 
 class PhoneBook extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
     name: '',
     number: '',
   };
@@ -25,34 +19,38 @@ class PhoneBook extends Component {
   handleFormSubmit = event => {
     event.preventDefault();
 
-    const existingContact = this.state.contacts.find(
-      contact => contact.name.toLowerCase() === this.state.name.toLowerCase()
+    const { name, number } = this.state;
+    const { contacts } = this.props;
+
+    const existingContact = contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
     );
 
     if (existingContact) {
       alert(
-        `Contact with the name ${this.state.name} already exists! Please enter a different name.`
+        `Contact with the name ${name} already exists! Please enter a different name.`
       );
     } else {
       const newContact = {
         id: nanoid(),
-        name: this.state.name,
+        name,
+        number,
       };
-      this.setState(prevState => ({
-        contacts: [...prevState.contacts, newContact],
-        name: '',
-        number: '',
-      }));
+
+      this.setState({ name: '', number: '' });
+      this.props.onContactAdd(newContact);
     }
   };
 
   render() {
+    const { name, number } = this.state;
+
     return (
       <form className={css.phoneBookForm} onSubmit={this.handleFormSubmit}>
         <label className={css.formName}>
           Name
           <input
-            value={this.state.name}
+            value={name}
             onChange={this.handleNameChange}
             className={css.formInput}
             type="text"
@@ -65,7 +63,7 @@ class PhoneBook extends Component {
         <label className={css.formName}>
           Number
           <input
-            value={this.state.number}
+            value={number}
             onChange={this.handleNumberChange}
             className={css.formInput}
             type="tel"
@@ -75,7 +73,9 @@ class PhoneBook extends Component {
             required
           />
         </label>
-        <button type="submit" className={css.formButton}>Add contact</button>
+        <button type="submit" className={css.formButton}>
+          Add contact
+        </button>
       </form>
     );
   }
